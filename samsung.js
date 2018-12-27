@@ -279,8 +279,9 @@ function main() {
             adapter.log.error('Usage of models H or J requires config (https://pastebin.com/bDPvPKVB)!');
         }
         const H = require('homebridge-homesung/src/homesung').Homesung;
+        adapter.log.info("Config: " + adapter.config.HJconfig)
         remote = new H({
-            config: adapter.config.HJconfig
+            config: JSON.parse(adapter.config.HJconfig)
         });
         createObjectsAndStates();
     }

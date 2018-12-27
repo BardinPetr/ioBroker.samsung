@@ -1,132 +1,200 @@
 <html>
+  <!-- these 4 files always have to be included -->
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"
+  />
+  <script
+    type="text/javascript"
+    src="../../lib/js/jquery-1.11.1.min.js"
+  ></script>
+  <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+  <script
+    type="text/javascript"
+    src="../../lib/js/jquery-ui-1.10.3.full.min.js"
+  ></script>
 
-<!-- these 4 files always have to be included -->
-<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
-<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
-<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
-
-
-<!-- optional: use jqGrid
+  <!-- optional: use jqGrid
 <link rel="stylesheet" type="text/css" href="../../lib/css/jqGrid/ui.jqgrid-4.5.4.css"/>
 <script type="text/javascript" src="../../lib/js/jqGrid/jquery.jqGrid-4.5.4.min.js"></script>
 <script type="text/javascript" src="../../lib/js/jqGrid/i18n/grid.locale-all.js"></script>
 -->
 
-<!-- optional: use multiselect
+  <!-- optional: use multiselect
 <link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/>
 <script type="text/javascript" src="../../lib/js/jquery.multiselect-1.13.min.js"></script>
 -->
 
-<!-- these two file always have to be included -->
-<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
-<script type="text/javascript" src="../../js/translate.js"></script>
-<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+  <!-- these two file always have to be included -->
+  <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+  <script type="text/javascript" src="../../js/translate.js"></script>
+  <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-
-<script type="text/javascript">
+  <script type="text/javascript">
+    var modelHJ = false;
 
     systemDictionary = {
-        "samsung adapter settings": {"de": "Samsung Einstellungen", "ru": "Samsung"},
-        "IP":                    {
-            "en": "IP",
-            "de": "IP",
-            "ru": "IP"
-        },
-        "Info": {
-            "de": "Hinweis",
-            "en": "Info"
-        },
-        "Settings": {
-            "de": "Einstellungen",
-            "en": "Settings"
-        },
-        "on save adapter restarts with new config immediately": {
-            "de": "Beim Speichern der Einstellungen wird der Adapter automatisch neu gestartet.",
-            "ru": "Сразу после сохранения настроек драйвер перезапуститься с новыми значениями"
-        }
+      "samsung adapter settings": {
+        de: "Samsung Einstellungen",
+        ru: "Samsung"
+      },
+      IP: {
+        en: "IP",
+        de: "IP",
+        ru: "IP"
+      },
+      Model: {
+        en: "Model",
+        ru: "Модель"
+      },
+      JSONConfig: {
+        en: "Configuration for https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js like https://pastebin.com/bDPvPKVB",
+        en: "Используется в https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js; привер тут: https://pastebin.com/bDPvPKVB"
+      },
+      Config: {
+        en: "Config JSON(for H/J only)",
+        ru: "JSON файл конфигурации (для моделей H или J)"
+      },
+      Info: {
+        de: "Hinweis",
+        en: "Info"
+      },
+      Settings: {
+        de: "Einstellungen",
+        en: "Settings"
+      },
+      "on save adapter restarts with new config immediately": {
+        de:
+          "Beim Speichern der Einstellungen wird der Adapter automatisch neu gestartet.",
+        ru:
+          "Сразу после сохранения настроек драйвер перезапуститься с новыми значениями"
+      }
     };
 
     function load(settings, onChange) {
-        for (var key in settings) {
-            if ($('#' + key + '.value').attr('type') == 'checkbox') {
-                $('#' + key + '.value').prop('checked', settings[key]).change(function () {
-                    onChange();
-                });
-            } else {
-                $('#' + key + '.value').val(settings[key]).change(function () {
-                    onChange();
-                }).keyup(function () {
-                    $(this).trigger('change');
-                });
-            }
+      for (var key in settings) {
+        if ($("#" + key + ".value").attr("type") == "checkbox") {
+          $("#" + key + ".value")
+            .prop("checked", settings[key])
+            .change(function() {
+              onChange();
+            });
+        } else {
+          $("#" + key + ".value")
+            .val(settings[key])
+            .change(function() {
+              onChange();
+            })
+            .keyup(function() {
+              $(this).trigger("change");
+            });
         }
-        onChange(false);
+      }
+      onChange(false);
     }
 
     function save(callback) {
-        var obj = {};
-        $('.value').each(function () {
-            var $this = $(this);
-            var id = $this.attr('id');
+      var obj = {};
+      $(".value").each(function() {
+        var $this = $(this);
+        var id = $this.attr("id");
 
-            if ($this.attr('type') == 'checkbox') {
-                obj[$this.attr('id')] = $this.prop('checked');
-            } else {
-                obj[$this.attr('id')] = $this.val();
-            }
-        });
-        callback(obj);
+        if ($this.attr("type") == "checkbox") {
+          obj[$this.attr("id")] = $this.prop("checked");
+        } else {
+          obj[$this.attr("id")] = $this.val();
+        }
+      });
+      obj["modelHJ"] = modelHJ;
+      callback(obj);
     }
 
-</script>
+    $(document).ready(function() {
+      $("#m1").prop("checked", true);
 
-<style>
+      $("#m0").change(function() {
+        modelHJ = true;
+        $("#conf_row").prop("disabled", true);
+        $("#conf_row").prop("disabled", true);
+        $("#ip_row").prop("disabled", false);
+      });
+      $("#m1").change(function() {
+        modelHJ = false;
+        $("#ip_row").prop("disabled", true);
+        $("#conf_row").prop("disabled", false);
+        $("#conf_row").prop("disabled", false);
+      });
+    });
+  </script>
+
+  <style>
     td {
-        font-size: 13px;
-        padding-left:1px;
-        padding-right: 4px;
-        padding-top: 3px;
-        padding-bottom: 3px;
+      font-size: 13px;
+      padding-left: 1px;
+      padding-right: 4px;
+      padding-top: 3px;
+      padding-bottom: 3px;
     }
     input {
-        font-size: 13px;
+      font-size: 13px;
     }
     h1 {
-        font-size: 11px;
-        color: #505050;
-        font-weight: bold;
-        width: 100%;
-        padding-left:6px;
-        padding-right: 5px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        background-color: #e0e0e0;
-        /*background-image: linear-gradient(to right, #e0e0e0, rgba(224,224,224,0.0));*/
-        /*background-image: linear-gradient(to right, #e0e0e0, #e8e8e8 50%, #e0e0e0);*/
+      font-size: 11px;
+      color: #505050;
+      font-weight: bold;
+      width: 100%;
+      padding-left: 6px;
+      padding-right: 5px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      background-color: #e0e0e0;
+      /*background-image: linear-gradient(to right, #e0e0e0, rgba(224,224,224,0.0));*/
+      /*background-image: linear-gradient(to right, #e0e0e0, #e8e8e8 50%, #e0e0e0);*/
     }
-</style>
+  </style>
 
-
-<div id="adapter-container" style="padding-left: 6px; padding-right: 0px; width: 97%;">
-
+  <div
+    id="adapter-container"
+    style="padding-left: 6px; padding-right: 0px; width: 97%;"
+  >
     <table>
-        <td><img src="samsung.png" /></td>
-        <td style="padding-top: 20px;padding-left: 10px"><h3 class="translate">samsung adapter settings</h3></td>
+      <td><img src="samsung.png" /></td>
+      <td style="padding-top: 20px;padding-left: 10px">
+        <h3 class="translate">samsung adapter settings</h3>
+      </td>
     </table>
 
     <h1 class="translate">Settings</h1>
 
     <table>
-        <tr><td class="translate">IP</td><td><input class="value" id="ip" type="input" size="15" /></td></tr>
+      <tr>
+        <td class="translate">Model:</td>
+        <td><input type="radio" id="m0" />H and J</td>
+        <td><input type="radio" id="m1" />Other</td>
+      </tr>
+      <tr id="ip_row">
+        <td class="translate">IP</td>
+        <td><input class="value" id="ip" type="input" size="15" /></td>
+      </tr>
+      <tr id="conf_row">
+        <td class="translate">Config</td>
+        <td><input class="value" id="HJconfig" type="input" size="40" /></td>
+      </tr>
+      <tr id="conf_row2">
+        <td class="translate">JSONConfig</td>        
+      </tr>
     </table>
 
     <div style="padding: 10px"></div>
     <h1 class="translate">Info</h1>
 
     <table>
-        <tr><td class="translate">on save adapter restarts with new config immediately</td></tr>
+      <tr>
+        <td class="translate">
+          on save adapter restarts with new config immediately
+        </td>
+      </tr>
     </table>
-</div>
-
+  </div>
 </html>
