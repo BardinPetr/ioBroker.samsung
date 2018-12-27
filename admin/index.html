@@ -49,8 +49,10 @@
         ru: "Модель"
       },
       JSONConfig: {
-        en: "Configuration for https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js like https://pastebin.com/bDPvPKVB",
-        en: "Используется в https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js; привер тут: https://pastebin.com/bDPvPKVB"
+        en:
+          "Configuration for https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js like https://pastebin.com/bDPvPKVB",
+        en:
+          "Используется в https://github.com/kkapitan/homebridge-homesung/blob/master/src/homesung.js; пример тут: https://pastebin.com/bDPvPKVB"
       },
       Config: {
         en: "Config JSON(for H/J only)",
@@ -72,6 +74,20 @@
       }
     };
 
+    function enableHJ(x) {
+      if (x) {
+        modelHJ = true;
+        $("#conf_row").prop("disabled", true);
+        $("#conf_row").prop("disabled", true);
+        $("#ip_row").prop("disabled", false);
+      } else {
+        modelHJ = false;
+        $("#ip_row").prop("disabled", true);
+        $("#conf_row").prop("disabled", false);
+        $("#conf_row").prop("disabled", false);
+      }
+    }
+
     function load(settings, onChange) {
       for (var key in settings) {
         if ($("#" + key + ".value").attr("type") == "checkbox") {
@@ -80,6 +96,8 @@
             .change(function() {
               onChange();
             });
+        } else if (key == "modelHJ") {
+          enableHJ(settings[key]);
         } else {
           $("#" + key + ".value")
             .val(settings[key])
@@ -111,19 +129,8 @@
     }
 
     $(document).ready(function() {
-      $("#m1").prop("checked", true);
-
-      $("#m0").change(function() {
-        modelHJ = true;
-        $("#conf_row").prop("disabled", true);
-        $("#conf_row").prop("disabled", true);
-        $("#ip_row").prop("disabled", false);
-      });
-      $("#m1").change(function() {
-        modelHJ = false;
-        $("#ip_row").prop("disabled", true);
-        $("#conf_row").prop("disabled", false);
-        $("#conf_row").prop("disabled", false);
+      $("input[type=radio][name=model]").change(function() {
+        enableHJ(this.id === "m0");
       });
     });
   </script>
@@ -170,8 +177,10 @@
     <table>
       <tr>
         <td class="translate">Model:</td>
-        <td><input type="radio" id="m0" />H and J</td>
-        <td><input type="radio" id="m1" />Other</td>
+        <td>
+          <input type="radio" name="model" id="m0" />H and J
+          <input type="radio" name="model" id="m1" />Other
+        </td>
       </tr>
       <tr id="ip_row">
         <td class="translate">IP</td>
@@ -182,7 +191,7 @@
         <td><input class="value" id="HJconfig" type="input" size="40" /></td>
       </tr>
       <tr id="conf_row2">
-        <td class="translate">JSONConfig</td>        
+        <td class="translate">JSONConfig</td>
       </tr>
     </table>
 
