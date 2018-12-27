@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "samsung",
-        "version": "0.2.9",
+        "version": "0.3.0",
         "news": {
+            "0.3.0": {
+                "en": "Added support for H and J models (from https://github.com/kkapitan/homebridge-homesung)"
+            },
             "0.2.9": {
                 "en": "Update utils.js and usage, CI Testing and deps (Apollon77)",
                 "de": "utils.js und Benutzung erneuert, CI Testing (Apollon77)"

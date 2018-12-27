@@ -78,7 +78,7 @@ function onOn(val) {
             adapter.setState ('Power.on', val, true);
             return;
         }
-        send(remote.powerKey);
+        send(remote.powerKey || "KEY_POWEROFF");
         if (onOffTimer) clearTimeout(onOffTimer);
         var cnt = 0;
 
@@ -169,11 +169,16 @@ var adapter = utils.Adapter({
 });
 
 function send(command, callback) {
+    var cb = callback || function nop () {};
     if (!command) {
         adapter.log.error("Empty commands will not be excecuted.");
         return;
     }
-    remote.send(command, callback || function nop () {});
+    if (adapter.config.modelHJ === true) {
+        remote.sendKey({key: command}).then(cb).catch(cb)
+    } else {
+        remote.send(command, cb);
+    }
 }
 
 
@@ -269,13 +274,22 @@ function main() {
         return;
     }
 
-    if (adapter.config.model2016 !== true) {
+    if (adapter.config.modelHJ === true) {
+        if(!adapter.config.HJconfig){
+            adapter.log.error('Usage of models H or J requires config (https://pastebin.com/bDPvPKVB)!');
+        }
+        const H = require('homebridge-homesung/src/homesung').Homesung;
+        remote = new H({
+            config: adapter.config.HJconfig
+        });
+        createObjectsAndStates();
+    }
+    else if (adapter.config.model2016 !== true) {
         remote = new SamsungRemote ({ip: adapter.config.ip});
         remote.powerKey = 'KEY_POWEROFF';
         if (adapter.config.model2016 === false) createObjectsAndStates();
     }
-
-    if (nodeVersion4 && adapter.config.model2016 !== false) {
+    else if (nodeVersion4 && adapter.config.model2016 !== false) {
         remote2016 = new Samsung2016 ({ip: adapter.config.ip, timeout: 2000});
         remote2016.onError = function (error) {
         }.bind (remote2016);

@@ -1,6 +1,6 @@
 {
   "name": "iobroker.samsung",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "description": "Samsung Adapter",
   "author": {
     "name": "soef",
@@ -27,6 +27,7 @@
     "url": "https://github.com/soef/iobroker.samsung"
   },
   "dependencies": {
+    "homebridge-homesung": "https://github.com/kkapitan/homebridge-homesung",
     "samsung-remote": "^1.2.5",
     "ws": "^2.3.1"
   },
